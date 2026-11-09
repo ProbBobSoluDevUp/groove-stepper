@@ -17,15 +17,6 @@
     <p>Paste a drum tab, press Enter, then step through it to see which drum each note is.</p>
   </header>
 
-  <section class="panel kit" aria-label="Drum kit">
-    <svg id="kit" viewBox="0 0 640 300" role="img" aria-label="Drum kit seen from the drummer's seat"></svg>
-    <div class="now">
-      <div class="count" id="nowCount">–</div>
-      <div class="hits" id="nowHits" aria-live="polite">Paste a tab and press Enter</div>
-      <div class="where" id="nowWhere"></div>
-    </div>
-  </section>
-
   <section class="input">
     <div class="row">
       <label class="label" for="tab">Drum tab</label>
@@ -40,6 +31,20 @@
     <span>or Ctrl + Enter in the box</span>
   </div>
 
+  <section class="panel kit" aria-label="Drum kit">
+    <svg id="kit" viewBox="0 0 640 300" role="img" aria-label="Drum kit seen from the drummer's seat"></svg>
+    <div class="now">
+      <div class="count" id="nowCount">–</div>
+      <div class="hits" id="nowHits" aria-live="polite">Paste a tab and press Enter</div>
+      <div class="where" id="nowWhere"></div>
+    </div>
+  </section>
+
+  <div class="nav">
+    <button class="arrow" id="prev" type="button" aria-label="Previous step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="pos"><b id="posMain">Step 0 of 0</b><span>← → step &nbsp;·&nbsp; Shift + ← → jump a bar &nbsp;·&nbsp; click any note to jump there</span></div>
+    <button class="arrow" id="next" type="button" aria-label="Next step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+  </div>
   <section class="panel" aria-label="Sheet music">
     <div class="out-head">
       <h2 id="songTitle">Sheet music</h2>
@@ -49,11 +54,6 @@
     <ul class="warn" id="warn"></ul>
   </section>
 
-  <div class="nav">
-    <button class="arrow" id="prev" type="button" aria-label="Previous step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <div class="pos"><b id="posMain">Step 0 of 0</b><span>← → step &nbsp;·&nbsp; Shift + ← → jump a bar &nbsp;·&nbsp; click any note to jump there</span></div>
-    <button class="arrow" id="next" type="button" aria-label="Next step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
-  </div>
 </div>
 </body>
 </html>
