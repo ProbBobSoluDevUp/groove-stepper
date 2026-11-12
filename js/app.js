@@ -7,8 +7,9 @@ const input = $('tab'), sheet = $('sheet'), warnEl = $('warn');
 const STORE_KEY = 'groove-stepper-tab';
 let song = null, cur = 0, lastWidth = 0;
 
-function setKit(col){
-  Object.values(kitEls).forEach(el => el.classList.remove('on', 'accent', 'ghost', 'open'));
+// col: the drums hit now. nextCol: the drums hit next, shown as a faint ring.
+function setKit(col, nextCol){
+  Object.values(kitEls).forEach(el => el.classList.remove('on', 'accent', 'ghost', 'open', 'next'));
   void kitSvg.getBoundingClientRect();
   (col || []).forEach(h => {
     const el = kitEls[h.inst];
@@ -17,6 +18,19 @@ function setKit(col){
     if (h.ghost) el.classList.add('ghost');
     if (h.open) el.classList.add('open');
   });
+  (nextCol || []).forEach(h => {
+    const el = kitEls[h.inst];
+    if (!el.classList.contains('on')) el.classList.add('next');
+  });
+}
+
+function nextHitAfter(k){
+  for (let j = k + 1; j < song.flat.length; j++){
+    const {mi, s} = song.flat[j];
+    const c = song.measures[mi].cols[s];
+    if (c.length) return c;
+  }
+  return null;
 }
 
 function describe(col){
@@ -35,7 +49,8 @@ function keepVisible(el){
   else if (r.right > c.right - 4) sheet.scrollLeft += r.right - c.right + 40;
 }
 
-function go(k){
+// opts comes from the player: which repeat pass this is, and the next hit in play order.
+function go(k, opts){
   if (!song || !song.flat.length) return;
   cur = Math.max(0, Math.min(song.flat.length - 1, k));
   sheet.querySelectorAll('.cur').forEach(e => e.classList.remove('cur'));
@@ -46,11 +61,13 @@ function go(k){
   const {mi, s} = song.flat[cur];
   const m = song.measures[mi];
   const col = m.cols[s];
-  setKit(col);
+  setKit(col, opts ? opts.nextCol : nextHitAfter(cur));
   $('nowCount').textContent = m.counts[s];
   $('nowHits').textContent = describe(col);
   const beat = Math.floor(s / m.g.S) + 1;
-  $('nowWhere').textContent = `Bar ${mi + 1} of ${song.measures.length} · beat ${beat}`;
+  let where = `Bar ${mi + 1} of ${song.measures.length} · beat ${beat}`;
+  if (opts && opts.passes > 1) where += ` · repeat ${opts.pass} of ${opts.passes}`;
+  $('nowWhere').textContent = where;
   $('posMain').textContent = `Step ${cur + 1} of ${song.flat.length}`;
   $('prev').disabled = cur === 0;
   $('next').disabled = cur === song.flat.length - 1;
@@ -74,6 +91,7 @@ function drawSheet(){
 
 function showMessage(html){
   song = null;
+  playerLoad(null);
   sheet.innerHTML = `<div class="msg">${html}</div>`;
   setKit([]);
   $('nowCount').textContent = '–';
@@ -94,6 +112,7 @@ function run(){
   }
   prepare(parsed);
   song = parsed;
+  playerLoad(song);
   const bars = song.measures.length;
   $('songMeta').textContent = [song.tempo ? `${song.tempo} BPM` : null, `${song.time.showNum}/${song.time.showDen}`, `${bars} bar${bars === 1 ? '' : 's'}`].filter(Boolean).join(' · ');
   warnEl.innerHTML = song.warnings.map(w => `<li>${esc(w)}</li>`).join('');
@@ -102,13 +121,17 @@ function run(){
   go(0);
 }
 
+// Moving by hand pauses playback first, so you never lose your place.
+function stepTo(k){ pausePlayback(); go(k); }
+function barJump(dir){ pausePlayback(); jumpBar(dir); }
+
 $('enter').addEventListener('click', run);
-$('prev').addEventListener('click', e => e.shiftKey ? jumpBar(-1) : go(cur - 1));
-$('next').addEventListener('click', e => e.shiftKey ? jumpBar(1) : go(cur + 1));
+$('prev').addEventListener('click', e => e.shiftKey ? barJump(-1) : stepTo(cur - 1));
+$('next').addEventListener('click', e => e.shiftKey ? barJump(1) : stepTo(cur + 1));
 $('loadExample').addEventListener('click', () => { input.value = EXAMPLE; save(); run(); });
 sheet.addEventListener('click', e => {
   const t = e.target.closest('[data-k]');
-  if (t && song) go(+t.dataset.k);
+  if (t && song) stepTo(+t.dataset.k);
 });
 
 function save(){ try { localStorage.setItem(STORE_KEY, input.value); } catch (_) {} }
@@ -119,13 +142,23 @@ document.addEventListener('keydown', e => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); run(); input.blur(); }
     return;
   }
-  const tag = e.target.tagName;
-  if (tag === 'INPUT' || tag === 'SELECT' || e.target.isContentEditable) return;
+  const t = e.target, tag = t.tagName;
+  const onSlider = tag === 'INPUT' && t.type === 'range';
+  if ((tag === 'INPUT' && !onSlider) || tag === 'SELECT' || t.isContentEditable) return;
   if (!song) return;
-  if (e.key === 'ArrowRight'){ e.preventDefault(); e.shiftKey ? jumpBar(1) : go(cur + 1); }
-  else if (e.key === 'ArrowLeft'){ e.preventDefault(); e.shiftKey ? jumpBar(-1) : go(cur - 1); }
-  else if (e.key === 'Home'){ e.preventDefault(); go(0); }
-  else if (e.key === 'End'){ e.preventDefault(); go(song.flat.length - 1); }
+  if (e.key === ' '){ e.preventDefault(); if (!e.repeat) togglePlayback(); return; }
+  if (onSlider) return;   // the speed slider uses the arrow keys itself
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === 'ArrowRight'){ e.preventDefault(); e.shiftKey ? barJump(1) : stepTo(cur + 1); }
+  else if (e.key === 'ArrowLeft'){ e.preventDefault(); e.shiftKey ? barJump(-1) : stepTo(cur - 1); }
+  else if (e.key === 'Home'){ e.preventDefault(); stepTo(0); }
+  else if (e.key === 'End'){ e.preventDefault(); stepTo(song.flat.length - 1); }
+  else if (e.key === '+' || e.key === '='){ e.preventDefault(); nudgeSpeed(5); }
+  else if (e.key === '-' || e.key === '_'){ e.preventDefault(); nudgeSpeed(-5); }
+});
+// Stop Space from also clicking whichever button has focus.
+document.addEventListener('keyup', e => {
+  if (e.key === ' ' && e.target.tagName === 'BUTTON') e.preventDefault();
 });
 
 let rz = 0;

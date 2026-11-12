@@ -11,6 +11,7 @@
 <script src="js/tab.js" defer></script>
 <script src="js/sheet.js" defer></script>
 <script src="js/kit.js" defer></script>
+<script src="js/player.js" defer></script>
 <script src="js/app.js" defer></script>
 </head>
 <body>
@@ -45,7 +46,17 @@
 
   <div class="nav">
     <button class="arrow" id="prev" type="button" aria-label="Previous step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <div class="pos"><b id="posMain">Step 0 of 0</b><span>← → step &nbsp;·&nbsp; Shift + ← → jump a bar &nbsp;·&nbsp; click any note to jump there</span></div>
+    <div class="mid">
+      <div class="controls">
+        <button class="play" id="play" type="button" aria-label="Play" disabled><svg id="playIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span id="playLabel">Play</span></button>
+        <div class="speed">
+          <label for="speed">Speed</label>
+          <input type="range" id="speed" min="40" max="100" step="5" value="100">
+          <output id="speedOut" for="speed">100% · 100 BPM</output>
+        </div>
+      </div>
+      <div class="pos"><b id="posMain">Step 0 of 0</b><span>← → step &nbsp;·&nbsp; Shift + ← → jump a bar &nbsp;·&nbsp; Space play/pause &nbsp;·&nbsp; + − speed &nbsp;·&nbsp; click any note to jump there</span></div>
+    </div>
     <button class="arrow" id="next" type="button" aria-label="Next step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
   </div>
 
