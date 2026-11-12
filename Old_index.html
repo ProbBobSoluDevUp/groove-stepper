@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Groove Stepper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Groove Stepper</h1>
+    <p>Paste a drum tab, press Enter, then step through it to see which drum each note is.</p>
+  </header>
+
+  <section class="input">
+    <div class="row">
+      <label class="label" for="tab">Drum tab</label>
+      <button class="linkbtn" id="loadExample" type="button">Load example</button>
+    </div>
+    <textarea id="tab" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+    <p class="hint">One line per drum: <code>CR</code> crash, <code>HH</code> hi-hat, <code>RD</code> ride, <code>T1</code> <code>T2</code> toms, <code>SD</code> snare, <code>FT</code> floor tom, <code>BD</code> kick, <code>HF</code> hi-hat pedal. Each character is one step and <code>|</code> is a bar line. <code>x</code> or <code>o</code> is a hit, <code>X</code> or <code>O</code> an accent, <code>g</code> a ghost note, <code>o</code> on the hi-hat line an open hat.</p>
+  </section>
+
+  <div class="enter-row">
+    <button class="enter" id="enter" type="button">Enter</button>
+    <span>or Ctrl + Enter in the box</span>
+  </div>
+
+  <section class="panel kit" aria-label="Drum kit">
+    <svg id="kit" viewBox="0 0 640 300" role="img" aria-label="Drum kit seen from the drummer's seat"></svg>
+    <div class="now">
+      <div class="count" id="nowCount">–</div>
+      <div class="hits" id="nowHits" aria-live="polite">Paste a tab and press Enter</div>
+      <div class="where" id="nowWhere"></div>
+    </div>
+  </section>
+
+  <div class="nav">
+    <button class="arrow" id="prev" type="button" aria-label="Previous step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="pos"><b id="posMain">Step 0 of 0</b><span>← → step &nbsp;·&nbsp; Shift + ← → jump a bar &nbsp;·&nbsp; click any note to jump there</span></div>
+    <button class="arrow" id="next" type="button" aria-label="Next step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+  </div>
+  <section class="panel" aria-label="Sheet music">
+    <div class="out-head">
+      <h2 id="songTitle">Sheet music</h2>
+      <div class="meta" id="songMeta"></div>
+    </div>
+    <div class="sheet" id="sheet"><div class="msg">Your sheet music shows up here.</div></div>
+    <ul class="warn" id="warn"></ul>
+  </section>
+
+</div>
+</body>
+</html>

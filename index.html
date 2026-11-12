@@ -8,7 +8,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="style.css">
-<script src="script.js" defer></script>
+<script src="js/tab.js" defer></script>
+<script src="js/sheet.js" defer></script>
+<script src="js/kit.js" defer></script>
+<script src="js/app.js" defer></script>
 </head>
 <body>
 <div class="wrap">
@@ -45,6 +48,7 @@
     <div class="pos"><b id="posMain">Step 0 of 0</b><span>← → step &nbsp;·&nbsp; Shift + ← → jump a bar &nbsp;·&nbsp; click any note to jump there</span></div>
     <button class="arrow" id="next" type="button" aria-label="Next step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
   </div>
+
   <section class="panel" aria-label="Sheet music">
     <div class="out-head">
       <h2 id="songTitle">Sheet music</h2>
@@ -53,7 +57,6 @@
     <div class="sheet" id="sheet"><div class="msg">Your sheet music shows up here.</div></div>
     <ul class="warn" id="warn"></ul>
   </section>
-
 </div>
 </body>
 </html>
