@@ -151,6 +151,8 @@ function renderRow(song, row, ri, avail, isLast){
     const cx = s => mx + pl + (s + 0.5) * sp;
     const K0 = song.offsets[mi];
 
+    // shaded band behind the whole bar, shown when the bar is picked for looping
+    bg.push(`<rect class="barbg" data-mi="${mi}" x="${f1(mx + 1)}" y="17" width="${f1(endX - mx - 2)}" height="${ROW_H - 19}" rx="6"/>`);
     for (let s = 0; s < m.steps; s++){
       bg.push(`<rect class="col" data-k="${K0 + s}" x="${f1(cx(s) - sp / 2 + 1)}" y="20" width="${f1(sp - 2)}" height="${ROW_H - 22}" rx="4"/>`);
       const isBeat = s % m.g.S === 0;

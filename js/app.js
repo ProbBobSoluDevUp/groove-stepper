@@ -41,10 +41,15 @@ function describe(col){
   }).join(' + ');
 }
 
+// Keeps the current row at the top of the sheet music box, like turning a page,
+// so the note you're on stays in view even when the page is scrolled.
 function keepVisible(el){
   const r = el.getBoundingClientRect(), c = sheet.getBoundingClientRect();
-  if (r.top < c.top + 4) sheet.scrollTop += r.top - c.top - 8;
-  else if (r.bottom > c.bottom - 4) sheet.scrollTop += r.bottom - c.bottom + 8;
+  const row = el.closest('svg.row');
+  if (row){
+    const dy = row.getBoundingClientRect().top - c.top - 4;
+    if (Math.abs(dy) > 1) sheet.scrollTop += dy;
+  }
   if (r.left < c.left + 4) sheet.scrollLeft += r.left - c.left - 40;
   else if (r.right > c.right - 4) sheet.scrollLeft += r.right - c.right + 40;
 }
@@ -66,11 +71,22 @@ function go(k, opts){
   $('nowHits').textContent = describe(col);
   const beat = Math.floor(s / m.g.S) + 1;
   let where = `Bar ${mi + 1} of ${song.measures.length} · beat ${beat}`;
-  if (opts && opts.passes > 1) where += ` · repeat ${opts.pass} of ${opts.passes}`;
+  if (Loop.on) where += ' · looping';
+  else if (opts && opts.passes > 1) where += ` · repeat ${opts.pass} of ${opts.passes}`;
   $('nowWhere').textContent = where;
+  setBeats(m.g.odd ? 1 : m.g.G, Math.floor(s / m.g.S), !!opts && s % m.g.S === 0);
   $('posMain').textContent = `Step ${cur + 1} of ${song.flat.length}`;
   $('prev').disabled = cur === 0;
   $('next').disabled = cur === song.flat.length - 1;
+}
+
+// Beat dots next to the step counter: n dots, dot i lit, pulse on the start of a beat.
+const beatsEl = $('beats');
+function setBeats(n, i, pulse){
+  if (beatsEl.childElementCount !== n) beatsEl.innerHTML = '<i></i>'.repeat(n);
+  [...beatsEl.children].forEach((d, j) => d.classList.toggle('on', j === i));
+  const d = beatsEl.children[i];
+  if (pulse && d){ d.classList.remove('pulse'); void d.offsetWidth; d.classList.add('pulse'); }
 }
 
 function jumpBar(dir){
@@ -87,6 +103,14 @@ function drawSheet(){
   lastWidth = sheet.clientWidth;
   const rows = layout(song, avail);
   sheet.innerHTML = rows.map((row, ri) => renderRow(song, row, ri, avail, ri === rows.length - 1)).join('');
+  // empty space after the last row so every row can scroll up to the top of the box
+  if (rows.length > 1){
+    const tail = document.createElement('div');
+    tail.className = 'tail';
+    tail.style.height = Math.max(0, Math.round((parseFloat(getComputedStyle(sheet).maxHeight) || 360) - ROW_H - 16)) + 'px';
+    sheet.appendChild(tail);
+  }
+  paintLoop();
 }
 
 function showMessage(html){
@@ -98,6 +122,7 @@ function showMessage(html){
   $('nowHits').textContent = 'Paste a tab and press Enter';
   $('nowWhere').textContent = '';
   $('posMain').textContent = 'Step 0 of 0';
+  beatsEl.innerHTML = '';
   $('prev').disabled = $('next').disabled = true;
 }
 
@@ -129,9 +154,14 @@ $('enter').addEventListener('click', run);
 $('prev').addEventListener('click', e => e.shiftKey ? barJump(-1) : stepTo(cur - 1));
 $('next').addEventListener('click', e => e.shiftKey ? barJump(1) : stepTo(cur + 1));
 $('loadExample').addEventListener('click', () => { input.value = EXAMPLE; save(); run(); });
+// Click a note to jump there. Shift + click picks bars for the loop instead.
 sheet.addEventListener('click', e => {
-  const t = e.target.closest('[data-k]');
-  if (t && song) stepTo(+t.dataset.k);
+  if (!song) return;
+  const t = e.target.closest('[data-k],[data-mi]');
+  if (!t) return;
+  const mi = t.dataset.mi != null ? +t.dataset.mi : song.flat[+t.dataset.k].mi;
+  if (e.shiftKey) chooseBars(mi);
+  else stepTo(t.dataset.k != null ? +t.dataset.k : song.offsets[mi]);
 });
 
 function save(){ try { localStorage.setItem(STORE_KEY, input.value); } catch (_) {} }
@@ -155,6 +185,8 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'End'){ e.preventDefault(); stepTo(song.flat.length - 1); }
   else if (e.key === '+' || e.key === '='){ e.preventDefault(); nudgeSpeed(5); }
   else if (e.key === '-' || e.key === '_'){ e.preventDefault(); nudgeSpeed(-5); }
+  else if (e.key === 'l' || e.key === 'L'){ e.preventDefault(); toggleLoop(); }
+  else if (e.key === 'Escape'){ clearLoop(); }
 });
 // Stop Space from also clicking whichever button has focus.
 document.addEventListener('keyup', e => {
