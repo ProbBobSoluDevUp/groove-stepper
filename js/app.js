@@ -147,8 +147,9 @@ function run(){
 }
 
 // Moving by hand pauses playback first, so you never lose your place.
-function stepTo(k){ pausePlayback(); go(k); }
-function barJump(dir){ pausePlayback(); jumpBar(dir); }
+// With sound on, you also hear the step you land on.
+function stepTo(k){ pausePlayback(); go(k); audition(); }
+function barJump(dir){ pausePlayback(); jumpBar(dir); audition(); }
 
 $('enter').addEventListener('click', run);
 $('prev').addEventListener('click', e => e.shiftKey ? barJump(-1) : stepTo(cur - 1));
@@ -186,6 +187,7 @@ document.addEventListener('keydown', e => {
   else if (e.key === '+' || e.key === '='){ e.preventDefault(); nudgeSpeed(5); }
   else if (e.key === '-' || e.key === '_'){ e.preventDefault(); nudgeSpeed(-5); }
   else if (e.key === 'l' || e.key === 'L'){ e.preventDefault(); toggleLoop(); }
+  else if (e.key === 'm' || e.key === 'M'){ e.preventDefault(); toggleSound(); }
   else if (e.key === 'Escape'){ clearLoop(); }
 });
 // Stop Space from also clicking whichever button has focus.

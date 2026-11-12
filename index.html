@@ -11,6 +11,7 @@
 <script src="js/tab.js" defer></script>
 <script src="js/sheet.js" defer></script>
 <script src="js/kit.js" defer></script>
+<script src="js/sound.js" defer></script>
 <script src="js/player.js" defer></script>
 <script src="js/app.js" defer></script>
 </head>
@@ -51,6 +52,7 @@
         <button class="play" id="play" type="button" aria-label="Play" disabled><svg id="playIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span id="playLabel">Play</span></button>
         <button class="tog" id="loop" type="button" aria-pressed="false" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg>Loop<small id="loopBars"></small></button>
         <button class="tog" id="countIn" type="button" aria-pressed="false">Count-in</button>
+        <button class="tog" id="sound" type="button" aria-pressed="true" aria-label="Sound on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7"/><path class="wave" d="M18.5 5.5a9 9 0 0 1 0 13"/><path class="mute" d="M16 9l6 6M22 9l-6 6"/></svg>Sound</button>
         <div class="speed">
           <label for="speed">Speed</label>
           <input type="range" id="speed" min="40" max="100" step="5" value="100">
@@ -59,7 +61,7 @@
       </div>
       <div class="pos">
         <div class="posline"><b id="posMain">Step 0 of 0</b><span class="beats" id="beats" aria-hidden="true"></span></div>
-        <span class="keys">← → step &nbsp;·&nbsp; Shift + ← → jump a bar &nbsp;·&nbsp; Space play/pause &nbsp;·&nbsp; + − speed &nbsp;·&nbsp; click a note to jump there<br>Shift + click notes to pick bars &nbsp;·&nbsp; L loop on/off &nbsp;·&nbsp; Esc clear the loop</span>
+        <span class="keys">← → step &nbsp;·&nbsp; Shift + ← → jump a bar &nbsp;·&nbsp; Space play/pause &nbsp;·&nbsp; + − speed &nbsp;·&nbsp; click a note to jump there<br>Shift + click notes to pick bars &nbsp;·&nbsp; L loop on/off &nbsp;·&nbsp; Esc clear the loop &nbsp;·&nbsp; M sound on/off</span>
       </div>
     </div>
     <button class="arrow" id="next" type="button" aria-label="Next step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
